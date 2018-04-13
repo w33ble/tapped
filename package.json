@@ -38,7 +38,8 @@
     "cjs": true
   },
   "dependencies": {
-    "esm": "^3.0.17"
+    "esm": "^3.0.17",
+    "fast-deep-equal": "^1.1.0"
   },
   "devDependencies": {
     "eslint": "^4.9.0",
