@@ -1,5 +1,12 @@
+import Runner from './runner.mjs';
 import assert from './assert.mjs';
-import { getRunTimer, getClearTimer, getDeferred, Tracker } from './utils.mjs';
+import {
+  getRunTimer,
+  getClearTimer,
+  getDeferred,
+  normalizeOptions,
+  TappedState,
+} from './utils.mjs';
 
 const TEST_TIMEOUT = 'TEST TIMEOUT';
 const TEST_END = 'TEST ENDED';
@@ -8,10 +15,13 @@ const TEST_THREW = 'TEST THREW';
 
 export default class Tapped {
   constructor(...args) {
-    const { title, opts, fn } = this.normalizeOptions(...args);
+    const { title, opts, fn } = normalizeOptions(...args);
 
     const defaultOpts = {
+      timeout: 3000,
       prefix: '',
+      skip: false,
+      implicitEnd: true,
     };
 
     const options = {
@@ -20,49 +30,94 @@ export default class Tapped {
     };
 
     this.title = options.prefix.length ? `${options.prefix} ${title}` : title;
+    this.timeout = options.timeout;
+    this.skip = options.skip;
+    this.implicitEnd = options.implicitEnd;
+    this.tracker = new TappedState(this.title);
     this.fn = fn;
-    this.tracker = new Tracker(this.title);
-    this.plan = null;
-    this.testCount = 0;
-    this.timeout = opts.timeout || 3000;
-    this.skip = opts.skip || false;
-    this.ok = true;
+    this.assertsPlanned = null;
+    this.assertsFound = 0;
+    this.assertResults = [];
 
     // start the runner, and also hide internal object properties
     return this.run();
   }
 
-  normalizeOptions(title, opts, fn) {
-    if (typeof opts === 'function') {
-      fn = opts;
-      opts = {};
-    }
-    return { title, opts, fn };
-  }
-
   getTestMethod() {
     const testMethod = (...args) => {
-      const { title, opts, fn } = this.normalizeOptions(...args);
+      const { title, opts, fn } = normalizeOptions(...args);
       const newOpts = { ...opts, prefix: this.title };
       this.isSuite = true;
-      return new Tapped(title, newOpts, fn);
-    }
+
+      // nested runners always have a concurrency of 1
+      const runnerDeferred = getDeferred();
+      const runner = new Runner(Tapped, { concurrency: 1, implicitEnd: this.implicitEnd });
+
+      runner(title, newOpts, fn);
+      runner.onComplete(runnerDeferred.defer);
+
+      return runnerDeferred.promise;
+    };
 
     // create base methods
-    testMethod.plan = val => (this.plan = val);
-    testMethod.timeout = val => (this.timeout = val);
-    testMethod.end = () => this.tracker.complete(TEST_END);
+    testMethod.plan = val => {
+      this.assertsPlanned = val;
+    };
+
+    testMethod.timeout = val => {
+      this.timeout = val;
+    };
+
+    testMethod.end = err => {
+      this.tracker.complete(TEST_END, err);
+    };
 
     // attach assert methods
     Object.keys(assert).forEach(a => {
       testMethod[a] = (...args) => {
         // keep track of assertion calls
-        this.testCount = this.testCount + 1;
-        return assert[a](...args);
-      }
+        this.assertsFound = this.assertsFound + 1;
+        this.assertResults.push(assert[a](...args));
+      };
     });
 
     return testMethod;
+  }
+
+  // TODO: remove this
+  debugOutput({ status, err, runtime }) {
+    if (!this.isSuite) {
+      console.log('# %s (%s) - %d ms', this.title, status, runtime);
+
+      if (status === TEST_THREW) {
+        console.log(err);
+      } else if (status !== TEST_TIMEOUT) {
+        if (this.assertsPlanned) {
+          console.log('expected %d assertions, got %d', this.assertsPlanned, this.assertsFound);
+        } else {
+          console.log('got %d assertion(s)', this.assertsFound);
+        }
+
+        const [passed, failed] = this.assertResults.reduce(
+          (acc, result) => {
+            if (result.pass) acc[0].push(result);
+            else acc[1].push(result);
+            return acc;
+          },
+          [[], []]
+        );
+
+        console.log(`${passed.length} of ${this.assertsFound} passed, ${failed.length} failed`);
+
+        if (failed.length > 0) {
+          failed.forEach(f => {
+            console.log(`${f.operator}; expected ${f.expected}, got ${f.actual} @ ${f.location}`);
+            console.log(f.stack);
+          });
+        }
+      }
+      console.log('');
+    }
   }
 
   run() {
@@ -107,25 +162,17 @@ export default class Tapped {
 
     this.tracker.onComplete((status, err) => {
       const runtime = getTime();
-      clearTimer && clearTimer();
+      if (clearTimer) clearTimer();
 
-      if (this.isSuite) {
-        console.log('## suite complete:', this.title);
-        console.log('run time:', runtime);
-        console.log('');
-        trackerDeferred.defer();
-        return;
-      }
+      // TODO: remove this
+      this.debugOutput({ status, err, runtime });
 
-      console.log('#', this.title);
-      console.log('status:', status);
-      if (status === TEST_THREW) console.error(err);
-      console.log('run time:', runtime);
-      console.log('assertions', this.testCount);
-      console.log('planned', this.plan);
-      console.log('');
-
-      trackerDeferred.defer();
+      trackerDeferred.defer({
+        results: this.assertResults,
+        planned: this.assertsPlanned,
+        found: this.assertsFound,
+        runtime,
+      });
     });
 
     return trackerDeferred.promise;

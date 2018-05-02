@@ -56,22 +56,19 @@ const checkThrownOutput = ({ error, message }, expected, shouldThrow = true) => 
 const assert = (pass, opts) => {
   if (!pass) {
     if (opts.error) {
-      const originalStack = (opts.error.stack || '')
-        .split('\n')
-        .map(s => s.trim());
+      const originalStack = (opts.error.stack || '').split('\n').map(s => s.trim());
       const localLineIndex = originalStack.findIndex(l => /^at checkThrows/.test(l));
       const stack = originalStack.slice(1, localLineIndex);
       const location = (stack[stack.length - 1] || '').replace(/^at/i, '');
       return { pass, stack, location, ...opts };
-    } else {
-      const err = new Error('tapped exception');
-      const stack = (err.stack || '')
-        .split('\n')
-        .slice(4, 5)
-        .map(s => s.trim());
-      const location = (stack[0] || '').replace(/^at/i, '');
-      return { pass, stack, location, ...opts };
     }
+    const err = new Error('tapped exception');
+    const stack = (err.stack || '')
+      .split('\n')
+      .slice(4, 5)
+      .map(s => s.trim());
+    const location = (stack[0] || '').replace(/^at/i, '');
+    return { pass, stack, location, ...opts };
   }
 
   return { pass, ...opts };

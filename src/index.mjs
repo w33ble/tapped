@@ -1,23 +1,6 @@
 import Tapped from './tapped.mjs';
+import Runner from './runner.mjs';
 
-function createInstance() {
-  const tests = new Set();
-
-  function createTest(...args) {
-    const test = new Tapped(...args);
-    tests.add(test);
-    return test;
-  }
-
-  createTest.skip = (title, opts, fn) => {
-    const test = new Tapped(title, { ...opts, skip: true }, fn);
-    tests.add(test);
-    return test;
-  }
-
-  return createTest;
-}
-
-const mainInstance = createInstance();
+const mainInstance = new Runner(Tapped);
 
 export default mainInstance;

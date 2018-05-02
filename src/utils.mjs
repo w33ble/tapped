@@ -15,7 +15,7 @@ export function getClearTimer(timeout, onTimeout) {
   };
 }
 
-export function Tracker(name) {
+export function TappedState() {
   this.resolved = false;
   this.completed = null;
 
@@ -26,10 +26,7 @@ export function Tracker(name) {
 
   this.complete = (...args) => {
     // subsequent calls are a noop
-    if (this.resolved) {
-      // console.warn('Test completed multiple times! (%s)', name);
-      return;
-    }
+    if (this.resolved) return;
     this.resolved = true;
 
     // handle resolution before listener attached
@@ -52,4 +49,18 @@ export function getDeferred() {
   });
 
   return { promise, defer };
+}
+
+export function normalizeOptions(title, opts, fn) {
+  const options = { title };
+
+  if (typeof opts === 'function') {
+    options.fn = opts;
+    options.opts = {};
+  } else {
+    options.opts = opts;
+    options.fn = fn;
+  }
+
+  return options;
 }
