@@ -7,10 +7,6 @@ const TEST_RESOLVE = 'TEST RESOLVED';
 const TEST_THREW = 'TEST THREW';
 
 export default class Tapped {
-  static skip = (title, opts, fn) => {
-    return new Tapped(title, { ...opts, skip: true }, fn);
-  };
-
   constructor(...args) {
     const { title, opts, fn } = this.normalizeOptions(...args);
 
@@ -72,7 +68,9 @@ export default class Tapped {
   run() {
     // skip test
     if (this.skip) {
-      console.log('SKIPPING', this.title);
+      console.log('# SKIPPED:', this.title);
+      console.log('run time: 0');
+      console.log('');
       return Promise.resolve();
     }
 
