@@ -13,7 +13,20 @@
     "type": "git",
     "url": "git+https://github.com/w33ble/tapped.git"
   },
-  "keywords": [],
+  "keywords": [
+    "tap",
+    "tape",
+    "ava",
+    "test",
+    "tests",
+    "testing",
+    "harness",
+    "assert",
+    "assertion",
+    "runner",
+    "concurrent",
+    "tap-producer"
+  ],
   "files": [
     "src/",
     "lib/",
