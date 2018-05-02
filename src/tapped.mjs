@@ -11,11 +11,8 @@ export default class Tapped {
     return new Tapped(title, { ...opts, skip: true }, fn);
   };
 
-  constructor(title, opts, fn) {
-    if (typeof opts === 'function') {
-      fn = opts;
-      opts = {};
-    }
+  constructor(...args) {
+    const { title, opts, fn } = this.normalizeOptions(...args);
 
     const defaultOpts = {
       prefix: '',
@@ -39,44 +36,45 @@ export default class Tapped {
     return this.run();
   }
 
+  normalizeOptions(title, opts, fn) {
+    if (typeof opts === 'function') {
+      fn = opts;
+      opts = {};
+    }
+    return { title, opts, fn };
+  }
+
+  getTestMethod() {
+    const testMethod = (...args) => {
+      const { title, opts, fn } = this.normalizeOptions(...args);
+      const newOpts = { ...opts, prefix: this.title };
+      this.isSuite = true;
+      return new Tapped(title, newOpts, fn);
+    }
+
+    // create base methods
+    testMethod.plan = val => (this.plan = val);
+    testMethod.timeout = val => (this.timeout = val);
+    testMethod.end = () => this.tracker.complete(TEST_END);
+
+    // attach assert methods
+    Object.keys(assert).forEach(a => {
+      testMethod[a] = (...args) => {
+        // keep track of assertion calls
+        this.testCount = this.testCount + 1;
+        return assert[a](...args);
+      }
+    });
+
+    return testMethod;
+  }
+
   run() {
     // skip test
     if (this.skip) {
       console.log('SKIPPING', this.title);
       return Promise.resolve();
     }
-
-    // create spec function argument
-    const proxy = new Proxy(
-      {
-        plan: num => {
-          this.plan = num;
-        },
-        timeout: t => {
-          this.timeout = t;
-        },
-        end: () => {
-          this.tracker.complete(TEST_END);
-        },
-      },
-      {
-        get: (obj, prop) => {
-          // return base object properties
-          if (prop in obj) return obj[prop];
-
-          // pass through assertions, but keep track of use
-          if (prop in assert) {
-            this.testCount = this.testCount + 1;
-            return assert[prop];
-          }
-
-          return (...args) => {
-            console.log('unknown proxy prop', prop);
-            console.log('proxy args', args);
-          };
-        },
-      }
-    );
 
     // start the runner timer
     let clearTimer;
@@ -86,7 +84,7 @@ export default class Tapped {
     // execute the test spec
     const testResult = new Promise((resolve, reject) => {
       try {
-        const result = this.fn(proxy);
+        const result = this.fn(this.getTestMethod());
         resolve(result);
       } catch (err) {
         reject(err);
@@ -112,6 +110,14 @@ export default class Tapped {
     this.tracker.onComplete((status, err) => {
       const runtime = getTime();
       clearTimer && clearTimer();
+
+      if (this.isSuite) {
+        console.log('## suite complete:', this.title);
+        console.log('run time:', runtime);
+        console.log('');
+        trackerDeferred.defer();
+        return;
+      }
 
       console.log('#', this.title);
       console.log('status:', status);
