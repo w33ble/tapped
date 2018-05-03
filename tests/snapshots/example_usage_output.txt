@@ -1,0 +1,127 @@
+TAP version 13
+# testing with plan (3ms)
+ok 1 1 is truthy
+ok 2 2 is truthy
+ok 3 0 is falsy
+# testing with end (0ms)
+# test failures with plan (1ms)
+ok 4 should be truthy
+not ok 5 should be truthy
+  ---
+    operator: ok
+    expected: true
+    actual: 0
+    at:  Tapped._da5‍.r.t [as fn] (/Users/d33t/repos/tapped/tests/lib/example_usage.mjs:28:5)
+    stack: |-
+      Error: should be truthy
+          at Tapped._da5‍.r.t [as fn] (/Users/d33t/repos/tapped/tests/lib/example_usage.mjs:28:5)
+  ...
+# testing async with plan (3ms)
+ok 6 should be equal
+# testing async with end (0ms)
+ok 7 should be truthy
+# testing async with end and failures (1ms)
+ok 8 should be truthy
+not ok 9 should be truthy
+  ---
+    operator: ok
+    expected: true
+    actual: 0
+    at:  Tapped._da5‍.r.test [as fn] (/Users/d33t/repos/tapped/tests/lib/example_usage.mjs:45:5)
+    stack: |-
+      Error: should be truthy
+          at Tapped._da5‍.r.test [as fn] (/Users/d33t/repos/tapped/tests/lib/example_usage.mjs:45:5)
+  ...
+# observes custom timeout (103ms)
+not ok 10 Expected 1 test but found 0
+  ---
+    operator: equal
+    expected: 1
+    actual: 0
+    at:  /Users/d33t/repos/tapped/lib/tapped.cjs.js:346:17
+    stack: |-
+      Error: Expected 1 test but found 0
+          at /Users/d33t/repos/tapped/lib/tapped.cjs.js:346:17
+  ...
+# handles throwing in tests (1ms)
+ok 11 should be truthy
+not ok 12 Test threw (Error: i haz a bad)
+  ---
+    operator: equal
+    expected: null
+    actual: 1
+    at:  /Users/d33t/repos/tapped/lib/tapped.cjs.js:346:17
+    stack: |-
+      Error: Test threw (Error: i haz a bad)
+          at /Users/d33t/repos/tapped/lib/tapped.cjs.js:346:17
+  ...
+# SKIPPED skipped tests are skipped
+# fails with wrong plan count too high (1ms)
+ok 13 should be truthy
+not ok 14 Expected 2 tests but found 1
+  ---
+    operator: equal
+    expected: 2
+    actual: 1
+    at:  /Users/d33t/repos/tapped/lib/tapped.cjs.js:350:26
+    stack: |-
+      Error: Expected 2 tests but found 1
+          at /Users/d33t/repos/tapped/lib/tapped.cjs.js:350:26
+  ...
+# fails with wrong plan count too low (1ms)
+ok 15 should be truthy
+ok 16 should be truthy
+not ok 17 Expected 1 test but found 2
+  ---
+    operator: equal
+    expected: 1
+    actual: 2
+    at:  /Users/d33t/repos/tapped/lib/tapped.cjs.js:350:26
+    stack: |-
+      Error: Expected 1 test but found 2
+          at /Users/d33t/repos/tapped/lib/tapped.cjs.js:350:26
+  ...
+# external lib with failure (1ms)
+not ok 18 should be equal
+  ---
+    operator: equal
+    expected: 2
+    actual: 3
+    at:  Tapped._da5‍.r.t [as fn] (/Users/d33t/repos/tapped/tests/lib/example_usage.mjs:84:5)
+    stack: |-
+      Error: should be equal
+          at Tapped._da5‍.r.t [as fn] (/Users/d33t/repos/tapped/tests/lib/example_usage.mjs:84:5)
+  ...
+# external lib throws (0ms)
+ok 19 should not throw
+ok 20 should throw
+# some suite a test (0ms)
+ok 21 should be truthy
+ok 22 should be truthy
+ok 23 should be equal
+# suite1 suite2 |A suite2 test (0ms)
+ok 24 should be truthy
+# suite1 suite2 suite3 |B suite3 test (0ms)
+ok 25 should be truthy
+ok 26 should be truthy
+# suite1 suite2 suite3 |C suite3 test (1ms)
+ok 27 should be truthy
+# async suite first (0ms)
+ok 28 should be equal
+# async suite second (0ms)
+ok 29 should be equal
+# runs suite tests in order, with async first (0ms)
+ok 30 should be equal
+# runs suite tests in order, with async second (0ms)
+ok 31 should be equal
+# runs suite tests in order, with async last (0ms)
+ok 32 number 1 is truthy
+ok 33 count is three
+# simple (0ms)
+ok 34 should be truthy
+
+1..34
+# tests 34
+# pass  27
+# fail  7
+# skip  1
