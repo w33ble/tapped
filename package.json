@@ -7,6 +7,7 @@
   "scripts": {
     "build": "bili",
     "lint": "eslint \"*.{js,mjs}\" \"src/**/*.{js,mjs}\"",
+    "test": "node -r esm tests/index.mjs",
     "start": "node ."
   },
   "repository": {
@@ -72,8 +73,11 @@
     "eslint-plugin-prettier": "^2.3.1",
     "eslint-plugin-react": "^7.1.0",
     "esm": "^3.0.17",
+    "execa": "^0.10.0",
     "husky": "^0.14.3",
     "lint-staged": "^7.0.4",
-    "prettier": "^1.9.0"
+    "prettier": "^1.9.0",
+    "simple-tap-parser": "^0.0.4",
+    "tape": "^4.9.0"
   }
 }
