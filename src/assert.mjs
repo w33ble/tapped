@@ -59,7 +59,7 @@ const assert = (pass, opts) => {
       const originalStack = (opts.error.stack || '').split('\n').map(s => s.trim());
       const localLineIndex = originalStack.findIndex(l => /^at checkThrows/.test(l));
       const stack = originalStack.slice(1, localLineIndex);
-      const location = (stack[stack.length - 1] || '').replace(/^at/i, '');
+      const location = (stack[stack.length - 1] || '').replace(/^at/i, '').trim();
       return { pass, stack, location, ...opts };
     }
     const err = new Error('tapped exception');

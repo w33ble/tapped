@@ -64,3 +64,11 @@ export function normalizeOptions(title, opts, fn) {
 
   return options;
 }
+
+export function flattenResults(results) {
+  return results.reduce((acc, result) => {
+    // preserve existing inner test results
+    if (result.results) return acc.concat(result);
+    return acc.concat(flattenResults(result.values));
+  }, []);
+}

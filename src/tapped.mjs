@@ -5,6 +5,7 @@ import {
   getClearTimer,
   getDeferred,
   normalizeOptions,
+  flattenResults,
   TappedState,
 } from './utils.mjs';
 
@@ -38,25 +39,36 @@ export default class Tapped {
     this.assertsPlanned = null;
     this.assertsFound = 0;
     this.assertResults = [];
+    this.isSuite = false;
+    this.suiteResults = null;
 
     // start the runner, and also hide internal object properties
-    return this.run();
+    return () => this.run();
   }
 
   getTestMethod() {
+    // create new runner, with onComplete handler
+    // runnerDeferred will resolve when the runner is finished
+    const runnerDeferred = getDeferred();
+    const runner = new Runner(Tapped, {
+      concurrency: 1, // nested runners always have a concurrency of 1
+      implicitEnd: this.implicitEnd, // preserve the implicitEnd setting
+      onComplete: results => {
+        // called when the runner is complete
+        runnerDeferred.defer({ title: this.title, results });
+      },
+    });
+
     const testMethod = (...args) => {
       const { title, opts, fn } = normalizeOptions(...args);
       const newOpts = { ...opts, prefix: this.title };
       this.isSuite = true;
 
-      // nested runners always have a concurrency of 1
-      const runnerDeferred = getDeferred();
-      const runner = new Runner(Tapped, { concurrency: 1, implicitEnd: this.implicitEnd });
-
+      // execute the new runner
       runner(title, newOpts, fn);
-      runner.onComplete(runnerDeferred.defer);
 
-      return runnerDeferred.promise;
+      // save the promise instance
+      this.suiteResults = runnerDeferred.promise;
     };
 
     // create base methods
@@ -120,13 +132,38 @@ export default class Tapped {
     }
   }
 
+  getPassedInfo(status, err) {
+    const endedEarly = !this.implicitEnd && status === TEST_RESOLVE && this.assertsPlanned == null;
+    const badStatus = status === TEST_THREW || status === TEST_TIMEOUT;
+    const plannedMismatch =
+      this.assertsPlanned != null && this.assertsPlanned !== this.assertsFound;
+
+    const results = {
+      passed: !endedEarly && !badStatus && !err && !plannedMismatch,
+      message: '',
+    };
+
+    if (err) results.message = String(err);
+    if (status === TEST_THREW) results.message = `Test threw (${String(err)})`;
+    if (status === TEST_TIMEOUT) results.message = `Test timed out (${this.timeout}ms)`;
+    if (endedEarly) results.message = 'Test ended unexpectedly';
+    if (plannedMismatch)
+      results.message = `Expected ${this.assertsPlanned} test${this.assertsPlanned > 1 ? 's' : ''} but found ${this.assertsFound}`;
+
+    return results;
+  }
+
   run() {
     // skip test
     if (this.skip) {
-      console.log('# SKIPPED:', this.title);
-      console.log('run time: 0');
-      console.log('');
-      return Promise.resolve();
+      // console.log('# SKIPPED:', this.title);
+      // console.log('');
+      return Promise.resolve({
+        title: this.title,
+        skipped: this.skip,
+        passed: true,
+        runtime: 0,
+      });
     }
 
     // start the runner timer
@@ -135,7 +172,7 @@ export default class Tapped {
     const getTime = getRunTimer();
 
     // execute the test spec
-    const testResult = new Promise((resolve, reject) => {
+    new Promise((resolve, reject) => {
       try {
         const result = this.fn(this.getTestMethod());
         resolve(result);
@@ -144,6 +181,13 @@ export default class Tapped {
       }
     }).then(
       () => {
+        if (this.isSuite) {
+          this.suiteResults.then(props => {
+            this.tracker.complete(TEST_RESOLVE, null, props);
+          });
+          return;
+        }
+
         this.tracker.complete(TEST_RESOLVE);
       },
       err => {
@@ -160,17 +204,33 @@ export default class Tapped {
       });
     }
 
-    this.tracker.onComplete((status, err) => {
+    this.tracker.onComplete((status, err, payload) => {
       const runtime = getTime();
       if (clearTimer) clearTimer();
 
       // TODO: remove this
-      this.debugOutput({ status, err, runtime });
+      // this.debugOutput({ status, err, runtime });
+
+      if (this.isSuite) {
+        const { title, results } = payload;
+
+        trackerDeferred.defer({
+          title: this.title,
+          values: flattenResults(results),
+          runtime,
+        });
+        return;
+      }
+
+      const { passed, message } = this.getPassedInfo(status, err);
 
       trackerDeferred.defer({
+        title: this.title,
         results: this.assertResults,
         planned: this.assertsPlanned,
         found: this.assertsFound,
+        passed,
+        message,
         runtime,
       });
     });
