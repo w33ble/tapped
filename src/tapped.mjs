@@ -55,7 +55,7 @@ export default class Tapped {
       implicitEnd: this.implicitEnd, // preserve the implicitEnd setting
       onComplete: results => {
         // called when the runner is complete
-        runnerDeferred.defer({ title: this.title, results });
+        runnerDeferred.defer(results);
       },
     });
 
@@ -96,42 +96,6 @@ export default class Tapped {
     return testMethod;
   }
 
-  // TODO: remove this
-  debugOutput({ status, err, runtime }) {
-    if (!this.isSuite) {
-      console.log('# %s (%s) - %d ms', this.title, status, runtime);
-
-      if (status === TEST_THREW) {
-        console.log(err);
-      } else if (status !== TEST_TIMEOUT) {
-        if (this.assertsPlanned) {
-          console.log('expected %d assertions, got %d', this.assertsPlanned, this.assertsFound);
-        } else {
-          console.log('got %d assertion(s)', this.assertsFound);
-        }
-
-        const [passed, failed] = this.assertResults.reduce(
-          (acc, result) => {
-            if (result.pass) acc[0].push(result);
-            else acc[1].push(result);
-            return acc;
-          },
-          [[], []]
-        );
-
-        console.log(`${passed.length} of ${this.assertsFound} passed, ${failed.length} failed`);
-
-        if (failed.length > 0) {
-          failed.forEach(f => {
-            console.log(`${f.operator}; expected ${f.expected}, got ${f.actual} @ ${f.location}`);
-            console.log(f.stack);
-          });
-        }
-      }
-      console.log('');
-    }
-  }
-
   getPassedInfo(status, err) {
     const endedEarly = !this.implicitEnd && status === TEST_RESOLVE && this.assertsPlanned == null;
     const badStatus = status === TEST_THREW || status === TEST_TIMEOUT;
@@ -148,7 +112,9 @@ export default class Tapped {
     if (status === TEST_TIMEOUT) results.message = `Test timed out (${this.timeout}ms)`;
     if (endedEarly) results.message = 'Test ended unexpectedly';
     if (plannedMismatch)
-      results.message = `Expected ${this.assertsPlanned} test${this.assertsPlanned > 1 ? 's' : ''} but found ${this.assertsFound}`;
+      results.message = `Expected ${this.assertsPlanned} test${
+        this.assertsPlanned > 1 ? 's' : ''
+      } but found ${this.assertsFound}`;
 
     return results;
   }
@@ -208,15 +174,10 @@ export default class Tapped {
       const runtime = getTime();
       if (clearTimer) clearTimer();
 
-      // TODO: remove this
-      // this.debugOutput({ status, err, runtime });
-
       if (this.isSuite) {
-        const { title, results } = payload;
-
         trackerDeferred.defer({
           title: this.title,
-          values: flattenResults(results),
+          values: flattenResults(payload),
           runtime,
         });
         return;
