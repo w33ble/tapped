@@ -1,3 +1,11 @@
+export function ownProp(obj, prop) {
+  return Object.prototype.hasOwnProperty.call(obj, prop);
+}
+
+export function isEnum(obj, prop) {
+  return Object.prototype.propertyIsEnumerable.call(obj, prop);
+}
+
 export function getRunTimer() {
   const now = new Date();
   return function stop() {

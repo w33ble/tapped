@@ -1,9 +1,6 @@
 import deepEqual from 'fast-deep-equal';
+import { ownProp, isEnum } from './utils.mjs';
 
-const isEnum = (obj, prop) => Object.prototype.propertyIsEnumerable.call(obj, prop);
-const ownProp = (obj, prop) => Object.prototype.hasOwnProperty.call(obj, prop);
-
-// mimic Object.is, see https://i.stack.imgur.com/zETNR.png
 const isEqual = (actual, expected) => Object.is(actual, expected);
 
 const checkThrows = fn => {
