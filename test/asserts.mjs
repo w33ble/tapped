@@ -1,20 +1,9 @@
 import test from 'tape';
+import ExtendableError from 'es6-error';
 import assert from '../src/assert.mjs';
 import { ownProp } from '../src/utils.mjs';
 
 const hasProps = (result, props) => props.every(prop => ownProp(result, prop));
-
-class ExtendableError extends Error {
-  constructor(message) {
-    super(message);
-    this.name = this.constructor.name;
-    if (typeof Error.captureStackTrace === 'function') {
-      Error.captureStackTrace(this, this.constructor);
-    } else {
-      this.stack = new Error(message).stack;
-    }
-  }
-}
 
 test('deepEqual', t => {
   const msg = 'should be equivalent';
@@ -307,7 +296,9 @@ test('fail', t => {
 test('throws', t => {
   const msg = 'should throw';
   ['throws', 'throw', 'doesThrow'].forEach(fn => {
+    class CustomErr extends ExtendableError {}
     const err = new Error('i throw fits');
+
     let result = assert[fn](() => {
       throw err;
     });
@@ -341,19 +332,15 @@ test('throws', t => {
     }, /notintheerrormessage/);
     t.notOk(result.pass, `${fn} fails with message check`);
 
-    class CustomErr extends ExtendableError {}
-
     result = assert[fn](() => {
       throw new CustomErr('so custom');
     }, CustomErr);
     t.ok(result.pass, `${fn} passes with instance check`);
 
-    result = assert[fn](
-      () => {
-        throw new CustomErr('so custom');
-      },
-      () => {}
-    );
+    function NotError() {}
+    result = assert[fn](() => {
+      throw new CustomErr('so custom');
+    }, NotError);
     t.notOk(result.pass, `${fn} fails with instance check`);
   });
 

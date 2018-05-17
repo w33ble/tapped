@@ -40,7 +40,11 @@ const checkThrownOutput = ({ error, message }, expected, shouldThrow = true) => 
 
   // compare error instance against a provided function
   if (typeof expected === 'function' && error) {
-    output.passed = error instanceof expected;
+    try {
+      output.passed = error instanceof expected;
+    } catch (e) {
+      output.passed = false;
+    }
     output.result.error = error.constructor;
   }
 
