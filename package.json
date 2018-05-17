@@ -1,6 +1,6 @@
 {
   "name": "tapped",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Async ready, concurrent, tap producing test runner",
   "main": "dist/tapped.cjs.js",
   "module": "dist/tapped.es.js",
