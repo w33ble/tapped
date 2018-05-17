@@ -9,8 +9,9 @@
     "build": "npm run build:node && npm run build:browser",
     "build:browser": "bili --format umd --input src/index.mjs --name tapped --moduleName tapped --outDir lib --target browser --banner",
     "build:node": "bili --format es,cjs --input src/index.mjs --name tapped --outDir lib --target node:6 --no-babel.babelrc",
-    "lint": "eslint \"*.{js,mjs}\" \"src/**/*.{js,mjs}\"",
-    "test": "node -r esm tests/index.mjs",
+    "precommit": "lint-staged",
+    "lint": "eslint '*.{js,mjs}' 'src/**/*.{js,mjs}' 'test/**/*.{js,mjs}'",
+    "test": "node -r esm test/index.mjs",
     "start": "node ."
   },
   "repository": {
@@ -44,6 +45,9 @@
   },
   "homepage": "https://github.com/w33ble/tapped",
   "lint-staged": {
+    "*.{js,mjs}": [
+      "eslint --fix"
+    ],
     "*.{js,mjs,json,css}": [
       "prettier --write"
     ]
