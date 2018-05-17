@@ -1,7 +1,7 @@
 {
   "name": "tapped",
   "version": "0.0.0",
-  "description": "Simple tap producing test runner",
+  "description": "Async ready, concurrent, tap producing test runner",
   "main": "lib/tapped.cjs.js",
   "module": "lib/tapped.es.js",
   "browser": "lib/tapped.js",
