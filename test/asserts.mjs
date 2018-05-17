@@ -1,9 +1,9 @@
 import test from 'tape';
 import ExtendableError from 'es6-error';
-import assert from '../src/assert.mjs';
-import { ownProp } from '../src/utils.mjs';
+import assert from '../dist/assert';
 
-const hasProps = (result, props) => props.every(prop => ownProp(result, prop));
+const hasProps = (result, props) =>
+  props.every(prop => Object.prototype.hasOwnProperty.call(result, prop));
 
 test('deepEqual', t => {
   const msg = 'should be equivalent';
