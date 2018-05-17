@@ -2,15 +2,14 @@
   "name": "tapped",
   "version": "0.0.0",
   "description": "Async ready, concurrent, tap producing test runner",
-  "main": "lib/tapped.cjs.js",
-  "module": "lib/tapped.es.js",
-  "browser": "lib/tapped.js",
+  "main": "dist/tapped.cjs.js",
+  "module": "dist/tapped.es.js",
+  "browser": "dist/tapped.js",
   "scripts": {
-    "build": "npm run build:node && npm run build:browser",
-    "build:browser":
-      "bili --format umd --input src/index.mjs --name tapped --moduleName tapped --outDir lib --target browser --banner",
-    "build:node":
-      "bili --format es,cjs --input src/index.mjs --name tapped --outDir lib --target node:6 --no-babel.babelrc",
+    "build": "npm run build:node && npm run build:assert && npm run build:browser",
+    "build:browser": "bili --format umd --input src/index.mjs --name tapped --moduleName tapped --target browser --banner",
+    "build:node": "bili --format es,cjs --input src/index.mjs --target node:6 --no-babel.babelrc",
+    "build:assert": "bili --format umd --input src/assert.mjs --name assert --moduleName tapped-assert --target node:6 --no-babel.babelrc",
     "precommit": "lint-staged",
     "version": "auto-changelog -p && auto-authors && git add CHANGELOG.md AUTHORS.md",
     "pretest": "npm run build",
@@ -38,9 +37,7 @@
   ],
   "files": [
     "src/",
-    "lib/",
-    "index.js",
-    "index.mjs",
+    "dist/",
     "CHANGELOG.md",
     "AUTHORS.md"
   ],
