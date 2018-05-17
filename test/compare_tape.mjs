@@ -2,13 +2,15 @@ import tape from 'tape';
 import execa from 'execa';
 import tap from 'simple-tap-parser';
 
-const Parser = tap.Parser;
+const { Parser } = tap;
 
 tape('matches tape output', t => {
-  const tapeCmd = execa('node', ['-r', 'esm', 'tests/lib/tape_runner.mjs'])
-    .catch(err => err.stdout);
-  const tappedCmd = execa('node', ['-r', 'esm', 'tests/lib/tapped_runner.mjs'])
-    .catch(err => err.stdout);
+  const tapeCmd = execa('node', ['-r', 'esm', 'tests/lib/tape_runner.mjs']).catch(
+    err => err.stdout
+  );
+  const tappedCmd = execa('node', ['-r', 'esm', 'tests/lib/tapped_runner.mjs']).catch(
+    err => err.stdout
+  );
 
   Promise.all([tapeCmd, tappedCmd])
     .then(output => {
@@ -40,7 +42,7 @@ tape('matches tape output', t => {
           )} not ${tappedDetails[3].replace(/[^0-9]/g, '')}`;
 
           t.equal(tapePlan, tappedPlan, `test plan mismatch ${i} should match`);
-          continue;
+          continue; // eslint-disable-line no-continue
         }
 
         t.deepEqual(

@@ -2,8 +2,9 @@ import fs from 'fs';
 import path from 'path';
 import tape from 'tape';
 import execa from 'execa';
-import tap from 'simple-tap-parser';
+// import tap from 'simple-tap-parser';
 
+// TODO: make snapshots work
 const snapshot = fs.readFileSync(path.resolve('tests/snapshots/example_usage_output.txt'), 'utf8');
 
 tape('example output matches snapshot', t => {

@@ -289,7 +289,7 @@ test('ifError', t => {
 });
 
 test('pass', t => {
-  let result = assert.pass('i did good');
+  const result = assert.pass('i did good');
   t.ok(result.pass, 'passes');
   t.ok(hasProps(result, ['pass', 'operator', 'msg']), 'pass has expected props');
 
@@ -297,7 +297,7 @@ test('pass', t => {
 });
 
 test('fail', t => {
-  let result = assert.fail('i did bad');
+  const result = assert.fail('i did bad');
   t.notOk(result.pass, 'fails');
   t.ok(hasProps(result, ['pass', 'operator', 'msg']), 'fail has expected props');
 
@@ -348,15 +348,17 @@ test('throws', t => {
     }, CustomErr);
     t.ok(result.pass, `${fn} passes with instance check`);
 
-    result = assert[fn](() => {
-      throw new CustomErr('so custom');
-    }, function notError() {});
+    result = assert[fn](
+      () => {
+        throw new CustomErr('so custom');
+      },
+      () => {}
+    );
     t.notOk(result.pass, `${fn} fails with instance check`);
   });
 
   t.end();
 });
-
 
 test('doesNotThrow', t => {
   const msg = 'should not throw';
@@ -402,9 +404,12 @@ test('doesNotThrow', t => {
     }, CustomErr);
     t.notOk(result.pass, `${fn} fails with instance check`);
 
-    result = assert[fn](() => {
-      throw new CustomErr('so custom');
-    }, function notError() {});
+    result = assert[fn](
+      () => {
+        throw new CustomErr('so custom');
+      },
+      () => {}
+    );
     t.ok(result.pass, `${fn} passes with instance check`);
   });
 

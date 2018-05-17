@@ -92,10 +92,10 @@ test('external lib throws', t => {
 const suite = test;
 
 // nesting tests
-suite('some suite', test => {
+suite('some suite', suiteTest => {
   let count = 0;
 
-  test('a test', t => {
+  suiteTest('a test', t => {
     t.plan(3);
     t.ok(1);
     t.ok(2);
@@ -126,33 +126,33 @@ suite('suite1', innerSuite => {
   });
 });
 
-suite('async suite', test => {
-  test('first', async t => {
+suite('async suite', suiteTest => {
+  suiteTest('first', async t => {
     const val = await Promise.resolve(1);
     t.equal(val, 1);
   });
 
-  test('second', async t => {
+  suiteTest('second', async t => {
     const val = await Promise.resolve(2);
     t.equal(val, 2);
   });
 });
 
-suite('runs suite tests in order, with async', test => {
+suite('runs suite tests in order, with async', suiteTest => {
   let count = 0;
 
-  test('first', async t => {
+  suiteTest('first', async t => {
     count += 1;
     const num = await Promise.resolve(count);
     t.equal(num, 1);
   });
 
-  test('second', t => {
+  suiteTest('second', t => {
     count += 1;
     t.equal(count, 2);
   });
 
-  test('last', t => {
+  suiteTest('last', t => {
     count += 1;
     t.ok(1, 'number 1 is truthy');
     t.equal(count, 3, 'count is three');
