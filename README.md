@@ -3,6 +3,7 @@
 Async ready, concurrent, tap producing test runner.
 
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/w33ble/tapped/master/LICENSE)
+[![Build Status](https://img.shields.io/travis/w33ble/tapped.svg?branch=master)](https://travis-ci.org/w33ble/tapped)
 [![npm](https://img.shields.io/npm/v/tapped.svg)](https://www.npmjs.com/package/tapped)
 [![Project Status](https://img.shields.io/badge/status-experimental-orange.svg)](https://nodejs.org/api/documentation.html#documentation_stability_index)
 
