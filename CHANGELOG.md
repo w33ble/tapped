@@ -1,6 +1,6 @@
 ### Changelog
 
-#### 0.1.0 (17 May 2018)
+#### v0.1.0 (17 May 2018)
 - fix: bug in error instance check [`41009a9`](https://github.com/w33ble/tapped/commit/41009a9f3b62b5720e471dae5d830569f41d1b6e)
 - feat: produce TAP output [`fe5a743`](https://github.com/w33ble/tapped/commit/fe5a743ce574db19697fc6c6b95087e8532ce17d)
 - fix: correctly start tests and handle nesting [`7527b64`](https://github.com/w33ble/tapped/commit/7527b64d21c589a80d51ae4f93d6deb021da774e)

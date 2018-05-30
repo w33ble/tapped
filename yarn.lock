@@ -610,6 +610,15 @@
     source-map "^0.5.6"
     vue-template-es2015-compiler "^1.6.0"
 
+"@w33ble/npm-auto-tools@*":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@w33ble/npm-auto-tools/-/npm-auto-tools-0.1.1.tgz#cbc7540db33a96caa5446769949989ae7292257e"
+  dependencies:
+    auto-authors "^0.1.1"
+    auto-changelog "^1.7.0"
+    execa "^0.10.0"
+    getopts "^2.0.6"
+
 abab@^1.0.4:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/abab/-/abab-1.0.4.tgz#5faad9c2c07f60dd76770f71cf025b62a63cfd4e"
@@ -828,9 +837,9 @@ auto-authors@^0.1.1:
     mri-help "^0.2.0"
     node-fetch "^2.1.2"
 
-auto-changelog@^1.4.6:
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/auto-changelog/-/auto-changelog-1.6.0.tgz#a4f208c5a1d670515aecf927336901c67d3709a1"
+auto-changelog@^1.7.0:
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/auto-changelog/-/auto-changelog-1.7.0.tgz#9034eb7dbd1fb4b893d61906f19456c75a369061"
   dependencies:
     babel-polyfill "^6.26.0"
     commander "^2.9.0"
@@ -2243,6 +2252,10 @@ get-stream@^3.0.0:
 get-value@^2.0.3, get-value@^2.0.6:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/get-value/-/get-value-2.0.6.tgz#dc15ca1c672387ca76bd37ac0a395ba2042a2c28"
+
+getopts@^2.0.6:
+  version "2.0.6"
+  resolved "https://registry.yarnpkg.com/getopts/-/getopts-2.0.6.tgz#4788d533a977527e79efd57b5e742ffa0dd33105"
 
 getpass@^0.1.1:
   version "0.1.7"
